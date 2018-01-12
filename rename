@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+"""Rename file or dir inplace."""
+import os
+import sys
+import errno
+import logging
+from pathlib import Path
+
+
+def rename(path, new_name):
+    """Rename file or directory."""
+    src_file = Path(path)
+    dst_file = src_file.parent / new_name
+    if not src_file.exists():
+        logging.error(f"File `{path}' does not exists")
+        terminate(errno.ENOENT)
+    if dst_file.exists():
+        logging.error(f"File `{new_name}' already exists")
+        terminate(errno.EEXIST)
+    src_file.rename(dst_file)
+
+
+def terminate(error):
+    """Terminate programm with error message."""
+    logging.error(os.strerror(error))
+    sys.exit(error)
+
+
+def usage():
+    """Print usage message."""
+    message = (
+        "rename path/to/file new_name\n"
+    )
+    print(message)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 3:
+        usage()
+        terminate(errno.EINVAL)
+    rename(sys.argv[1], sys.argv[2])
